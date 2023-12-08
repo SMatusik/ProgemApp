@@ -1,0 +1,39 @@
+---
+
+version: '3.8'
+
+services:
+  postresql:
+    image: postgres:15
+    restart: always
+    container_name: progem-postgres
+    environment:
+      POSTGRES_USER: progem
+      POSTGRES_PASSWORD: progem
+      POSTGRES_DB: progem
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - 5433:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U progem -d progem"]
+      interval: 1s
+      timeout: 10s
+      retries: 60
+
+
+  redis:
+    init: true
+    restart: always
+    image: redis:6.2-alpine
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli", "ping" ]
+      interval: 1s
+      timeout: 10s
+      retries: 60
+
+
+volumes:
+  pgdata:
