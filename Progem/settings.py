@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # user defined
-    "user.apps.UserConfig",
+    "user",
     "project",
     "task",
     "invitation",
