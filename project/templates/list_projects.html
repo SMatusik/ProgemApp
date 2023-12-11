@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Home Page{% endblock %}
+
+{% load static %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1>List of Projects</h1>
+                    <a href="/project/create/" class="btn btn-primary">Create New</a>
+                </div>
+                {% if projects %}
+                    <ul class="list-group">
+                        {% for project in projects %}
+                            <li class="list-group-item">
+                                <a href="/project/view/{{ project.uuid }}/">{{ project.name }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="d-flex justify-content-center align-items-center vh-100">
+                        <div class="text-center mt-5">
+                            <p>No projects yet. <a href="/project/create/">Want to create one?</a></p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

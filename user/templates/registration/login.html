@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  {% if form.errors %}
+    <p>Your email address and password didn't match. Please try again.</p>
+  {% endif %}
+
+  {% if next %}
+    {% if user.is_authenticated %}
+      <p>Your account doesn't have access to this page. To proceed,
+      please login with an account that has access.</p>
+    {% else %}
+      <p>Please login to see this page.</p>
+    {% endif %}
+  {% endif %}
+
+<div class="container py-5">
+  <h1> Login </h1>
+  <form method="POST">{% csrf_token %}
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">
+
+        <!-- Email address field -->
+        <label for="id_login">Email</label>
+        <input id="id_login" name="login" class="form-control">
+
+        <!-- Password field -->
+        <label for="id_password">Password</label>
+        <input id="id_password" name="password" type="password" class="form-control">
+
+      </legend>
+    </fieldset>
+    <div class="form-group">
+      <button type="submit" class="btn btn-primary">Login</button>
+    </div>
+  </form>
+  <div class="container py-1"></div>
+    <div class="border-top pt-2">
+      <small class="text-muted">Don't have an account?
+        <a class="ml-2" href="{% url 'register' %}">Register</a>
+      </small>
+      <br>
+        {# Assumes you setup the password_reset view in your URLconf #}
+      <small class="text-muted"> Lost password?
+        <a class="ml-2" href="{% url 'password_reset' %}"> Reset account</a>
+      </small>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

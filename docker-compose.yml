@@ -3,10 +3,22 @@
 version: '3.8'
 
 services:
-  postresql:
+  web:
+    build: .
+    ports:
+      - 8001:8000
+    volumes:
+      - .:/app
+    stdin_open: true
+    tty: true
+    depends_on:
+      postgresql:
+        condition: service_healthy
+
+
+  postgresql:
     image: postgres:15
     restart: always
-    container_name: progem-postgres
     environment:
       POSTGRES_USER: progem
       POSTGRES_PASSWORD: progem

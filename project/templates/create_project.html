@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Create Project{% endblock %}
+
+{% load static %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <h1>Create a New Project</h1>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="name">Name:</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="description">Description:</label>
+                        <textarea class="form-control" id="description" name="description" required></textarea>
+                    </div>
+                    <br>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="started" name="started">
+                        <label class="form-check-label" for="started">Started</label>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="end_date">End Date:</label>
+                        <select class="form-control" id="end_date" name="end_date">
+                            <option value="">No end date specified</option>
+                            <option value="specific_date">Specify End Date</option>
+                        </select>
+                        <input type="datetime-local" class="form-control mt-2" id="specified_end_date" name="specified_end_date" style="display: none;">
+                    </div>
+                    <br>
+                    <!-- Add user selection input if needed -->
+                    <!--<div class="form-group">
+                        <label for="users">Users:</label>
+                        <select class="form-control" id="users" name="users" multiple>
+                            <option value="user1">User 1</option>
+                            <option value="user2">User 2</option>
+                            ...
+                        </select>
+                    </div>-->
+                    <br>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Create Project</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('end_date').addEventListener('change', function() {
+            const specifiedEndDate = document.getElementById('specified_end_date');
+            if (this.value === 'specific_date') {
+                specifiedEndDate.style.display = 'block';
+                specifiedEndDate.setAttribute('required', 'required');
+            } else {
+                specifiedEndDate.style.display = 'none';
+                specifiedEndDate.removeAttribute('required');
+            }
+        });
+    </script>
+{% endblock %}
