@@ -13,3 +13,4 @@ class UserConfig(AppConfig):
 #     }
 #
 # admin.site.register(YourModel, YourModelAdmin)
+

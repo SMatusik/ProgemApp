@@ -1,7 +1,7 @@
 import uuid
 from django.db import models
 
-from .managers import ProjectInvitationManager
+from invitation.managers import ProjectInvitationManager
 
 
 class ProjectInvitation(models.Model):

@@ -20,16 +20,20 @@
                 <p>Started: {% if project.started %}Yes{% else %}No{% endif %}</p>
                 <p>Created By: {{ project.created_by.email }}</p>
                 <br>
-                {% if project.tasks.all %}
-                    <h3>Tasks for This Project:</h3>
-                    <ul>
-                        {% for task in project.tasks.all %}
-                            <li>{{ task.name }}</li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p>No tasks yet for this project.</p>
-                {% endif %}
+             {% if tasks %}
+                <h3>Tasks for This Project:</h3>
+                <ul>
+                    {% for task in tasks %}
+                        <li>
+                            <a href="#" style="display: none;">{{ task.name }}</a>
+                            <span>{{ task.story_points }}</span>
+                            <a href="{% url 'view_task' task.uuid %}" class="float-right">Details</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No tasks yet for this project.</p>
+            {% endif %}
                 <br>
 
                 {% if project.users.all %}

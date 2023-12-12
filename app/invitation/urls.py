@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from invitation import views
 
 urlpatterns = [
     path("create/<uuid:project_id>/", views.create_invitation, name="create_invitation"),

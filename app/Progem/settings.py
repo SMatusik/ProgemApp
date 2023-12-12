@@ -14,20 +14,25 @@ from pathlib import Path
 
 from django.contrib import messages
 
+from common.config import read_config
+
+config = read_config()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-v#!4gay09tyfbxqa!8nt#d#dhskzbq15jllt$h&__$x#v935@5"
+SECRET_KEY = config.app.web.secret
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config.app.web.debug
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "0.0.0.0"]
 
 
 # Application definition
@@ -49,7 +54,6 @@ INSTALLED_APPS = [
     "crispy_bootstrap5"
 ]
 
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 CRISPY_ALLOWED_TEMPLATE_PACK = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
@@ -69,7 +73,7 @@ ROOT_URLCONF = "Progem.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": ["./app/templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -84,18 +88,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "Progem.wsgi.application"
 
-
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'progem',
-        'USER': 'progem',
-        'PASSWORD': 'progem',
-        'HOST': 'postgresql',
-        'PORT': '5432',
+        'NAME': config.app.db.name,
+        'USER': config.app.db.user,
+        'PASSWORD': config.app.db.password,
+        'HOST':  config.app.db.host,
+        'PORT': config.app.db.port,
     }
 }
 

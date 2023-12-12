@@ -13,8 +13,8 @@ class Task(models.Model):
     name = models.TextField(("name"), max_length=50)
     description = models.TextField(("description"), max_length=250)
 
-    reporter = models.ForeignKey("user.CustomerUser", on_delete=models.DO_NOTHING)
-    assignee = models.ForeignKey("user.CustomerUser", on_delete=models.DO_NOTHING)
+    reporter = models.ForeignKey("user.CustomUser", on_delete=models.DO_NOTHING, related_name="reporter")
+    assignee = models.ForeignKey("user.CustomUser", on_delete=models.DO_NOTHING, related_name="asignee")
 
     project = models.ForeignKey("project.Project", on_delete=models.CASCADE)
 

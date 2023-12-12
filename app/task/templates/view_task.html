@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Create task{% endblock %}
+
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1>Task: {{ task.name }}</h1>
+            <p>Description: {{ task.description }}</p>
+            <p>Reporter: {{ task.reporter }}</p>
+            <p>Assignee: {{ task.assignee }}</p>
+            <p>Project: {{ task.project }}</p>
+            <p>Date Created: {{ task.date_created }}</p>
+            <p>Story Points: {{ task.story_points }}</p>
+
+            {% if task.finished %}
+                <p>Status: Finished</p>
+            {% else %}
+                <p>Status: Not Finished</p>
+            {% endif %}
+
+            <a href="{% url 'edit_task' task.uuid %}" class="btn btn-primary">Edit Task</a>
+            <a href="{% url 'delete_task' task.uuid %}" class="btn btn-danger">Delete Task</a>
+
+            <a href="{% url 'project_detail' task.project.uuid %}" class="btn btn-secondary mt-3">Back to Project</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

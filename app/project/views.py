@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import render, redirect
@@ -38,10 +39,11 @@ def create_project(request):
 
         new_project.save()
         new_project.super_users.add(user)
-        # Redirect or render success message
-        return redirect("create")
+
+        messages.success(request=request, message=f"Project {new_project.name} has been created.")
+
+        return redirect("list_projects")
     else:
-        # Render the form to create a new project
         return render(request, 'create_project.html')
 
 
@@ -49,6 +51,10 @@ def create_project(request):
 def list_projects(request):
     user = request.user
     projects = Project.objects.filter(Q(users=user) | Q(super_users=user))
+
+    if not projects:
+        messages.warning(request=request, message=f"You've got no active projects")
+
     return render(request, 'list_projects.html', {'projects': projects})
 
 
@@ -58,6 +64,7 @@ def view_project(request, project_id: UUID):
 
     invitations = ProjectInvitation.objects.filter(Q(project=project) & Q(active=True)).all()
     tasks = Task.objects.filter(Q(project=project)).all()
+    # import pdb; pdb.set_trace()
     context = {
         "project": project,
         "invitations": invitations,
@@ -76,5 +83,7 @@ def edit_project(request, project_id: UUID):
 @login_required
 def delete_project(request, project_id: UUID):
     project = Project.objects.filter(uuid=project_id).first().delete()
+
+    messages.success(request=request, message=f"Project {project.name} has been sucessfully deleted.")
 
     return redirect('list_projects')
