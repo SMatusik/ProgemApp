@@ -21,10 +21,7 @@
                 <p>Status: Not Finished</p>
             {% endif %}
 
-            <a href="{% url 'edit_task' task.uuid %}" class="btn btn-primary">Edit Task</a>
-            <a href="{% url 'delete_task' task.uuid %}" class="btn btn-danger">Delete Task</a>
 
-            <a href="{% url 'project_detail' task.project.uuid %}" class="btn btn-secondary mt-3">Back to Project</a>
         </div>
     </div>
 </div>

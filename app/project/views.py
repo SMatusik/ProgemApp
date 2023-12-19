@@ -50,7 +50,7 @@ def create_project(request):
 @login_required
 def list_projects(request):
     user = request.user
-    projects = Project.objects.filter(Q(users=user) | Q(super_users=user))
+    projects = Project.objects.filter(Q(users=user) | Q(super_users=user)).distinct().prefetch_related('tasks')
 
     if not projects:
         messages.warning(request=request, message=f"You've got no active projects")

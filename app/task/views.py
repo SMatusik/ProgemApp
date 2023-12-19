@@ -42,15 +42,16 @@ def create_task(request, project_uuid: UUID):
 def view_task(request, task_id: UUID):
     user = request.user
     project = Project.objects.filter(
-        Q(users=user)
+        Q(users=user) |
+        Q(super_users=user)
     ).first()
 
     task = Task.objects.filter(
         Q(uuid=task_id) &
         Q(project=project)
     ).first()
-    
-    return render("view_task", {"task": task})
+
+    return render(request,"view_task.html", {"task": task})
 
 
 @login_required
@@ -61,15 +62,18 @@ def edit_task(request, task_id: UUID):
 @login_required
 def delete_task(request, task_id: UUID):
     user = request.user
+
+    task = Task.objects.filter(
+        Q(uuid=task_id)
+    ).first()
     project = Project.objects.filter(
-        Q(users=user)
+        Q(users=user) |
+        Q(id=task.project.id)
     ).first()
     
-    task = Task.objects.filter(
-        Q(uuid=task_id) &
-        Q(project=project)
-    ).delete()
 
-    messages.success(request=request, message=f"Task {task.name} has been deleted from a project")
-    
+    if task:
+        task.delete()
+        messages.success(request=request, message=f"Task {task.name} has been deleted from a project")
+
     return redirect("view_project", project.uuid)

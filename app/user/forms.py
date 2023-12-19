@@ -1,4 +1,4 @@
-from django.forms import EmailField, PasswordInput, TextInput, CharField
+from django.forms import EmailField, PasswordInput, TextInput, CharField, Textarea
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 from user.models import CustomUser
@@ -10,6 +10,10 @@ class RegisterForm(UserCreationForm):
     class Meta:
         model = CustomUser
         fields = ["email", "first_name", "last_name", "password1", "password2"]
+        widgets = {
+            'first_name': Textarea(attrs={'rows': 1, 'cols': 15}),
+            'last_name': Textarea(attrs={'rows': 1, 'cols': 15}),
+        }
 
 
 class LoginForm(AuthenticationForm):

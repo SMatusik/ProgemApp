@@ -1,78 +1,143 @@
 {% extends 'base.html' %}
 {% block title %}View Project{% endblock %}
-
+{% load static %}
 {% block content %}
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-md-8 offset-md-2">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h1>Project {{ project.name }}</h1>
-                    <div>
-                        {% if user in project.super_users.all %}
-                            <a href="{% url 'edit_project' project.uuid %}" class="btn btn-primary mr-2">Edit</a>
-                            <a href="{% url 'create_invitation' project.uuid %}" class="btn btn-secondary mr-2">Add user</a>
-                            <a href="{% url 'delete_project' project.uuid %}" class="btn btn-danger">Delete</a>
-                        {% endif %}
-                        <a href="{% url 'create_task' project.uuid %}" class="btn btn-success">Add Task</a>
-                    </div>
-                </div>
-                <p>Description: {{ project.description }}</p>
-                <p>Started: {% if project.started %}Yes{% else %}No{% endif %}</p>
-                <p>Created By: {{ project.created_by.email }}</p>
-                <br>
-             {% if tasks %}
-                <h3>Tasks for This Project:</h3>
-                <ul>
-                    {% for task in tasks %}
-                        <li>
-                            <a href="#" style="display: none;">{{ task.name }}</a>
-                            <span>{{ task.story_points }}</span>
-                            <a href="{% url 'view_task' task.uuid %}" class="float-right">Details</a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>No tasks yet for this project.</p>
-            {% endif %}
-                <br>
-
-                {% if project.users.all %}
-                    <h3>Users Assigned to This Project:</h3>
-                    <ul>
-                        {% for user in project.users.all %}
-                            <li>{{ user.email }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-
-                {% if user in project.super_users.all %}
-                    <h3>Super Users:</h3>
-                    <ul>
-                        {% for super_user in project.super_users.all %}
-                            <li>{{ super_user.email }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-                {% if invitations and user in project.super_users.all %}
-                    <h3>Pending invitations:</h3>
-                    <ul>
-                        {% for invitation in invitations %}
-                            <li>{{ invitation.target_user_email }}, sent on {{ invitation.date_created }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-
-                <a href="{% url 'list_projects' %}" class="btn btn-secondary mt-3">Back to Projects</a>
+<div class="container mt-5">
+   <div class="row">
+      <div class="col-md-8 offset-md-2">
+         <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="d-flex align-items-center">
+               {% if project.started %}
+               <span class="bi bi-check-circle-fill text-success"></span>
+               {% else %}
+               <span class="bi bi-x-circle-fill text-danger"></span>
+               {% endif %}
+               Project {{ project.name }}
+            </h1>
+            <div>
+               {% if user in project.super_users.all %}
+               <a href="{% url 'edit_project' project.uuid %}" class="btn btn-primary mr-2">Edit</a>
+               <button id="deleteBtn" class="btn btn-danger">Delete</button>
+               {% endif %}
             </div>
-        </div>
-    </div>
-{% endblock %}
+         </div>
+         <div class="card mb-3">
+            <div class="card-body">
+               <h5 class="card-title">Description</h5>
+               <p class="card-text">{{ project.description }}</p>
+            </div>
+         </div>
+         <div class="card mb-3">
+            <div class="card-body">
+               <h5 class="card-title">Status</h5>
+               <p class="card-text {% if project.started %}text-success{% else %}text-danger{% endif %}">
+                  {% if project.started %}Started{% else %}Not Started{% endif %}
+               </p>
+            </div>
+         </div>
+         <div class="card mb-3">
+            <div class="card-body">
+               <h5 class="card-title">Created By</h5>
+               <p class="card-text">{{ project.created_by.email }}</p>
+            </div>
+         </div>
+         <div class="mt-4">
+            <div class="mt-4 d-flex justify-content-between align-items-center">
+               <h3>Tasks</h3>
+               <a href="{% url 'create_task' project.uuid %}" class="btn btn-success">Add Task</a>
+            </div>
+            <br>
+            {% if tasks %}
+            <ul class="list-group">
+               {% for task in tasks %}
+               <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                     <b><span class="task-name"><span class="badge bg-primary">{{ task.get_state_display }}</span> {{ task.name }}</span></b>
+                     <span class="assignee">{% if task.assignee %}{{ task.assignee.email }}{% else %}Not Assigned{% endif %}</span>
+                  </div>
+                  <div>
+                     <a href="{% url 'view_task' task.uuid %}" class="btn btn-info btn-sm mr-2" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ task.description }}">Details</a>
+                     <a href="{% url 'delete_task' task.uuid %}" class="btn btn-danger btn-sm mr-2">Remove</a>
+                  </div>
+               </li>
+               {% endfor %}
+            </ul>
+            {% else %}
+            <p>No tasks yet for this project.</p>
+            {% endif %}
+         </div>
+         <br>
+         <div>
+            <!-- Users Section -->
+            <div class="mt-4">
+               <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="toggle-section" data-toggle-target="#collapseUsers" style="cursor: pointer;"> Users</h3>
+                  {% if user in project.super_users.all %}
+                  <a href="{% url 'create_invitation' project.uuid %}" class="btn btn btn-success">Invite user</a>
+                  {% endif %}
+               </div>
+               <div class="collapse mt-3" id="collapseUsers">
+                  {% if project.users.all %}
+                  <ul class="list-group">
+                     {% for user in project.super_users.all %}
+                     <!-- Display super users -->
+                     <li class="list-group-item">{{ user.email }}</li>
+                     {% endfor %}
+                     {% for user in project.users.all %}
+                     <!-- Display other users -->
+                     <li class="list-group-item">{{ user.email }}</li>
+                     {% endfor %}
+                  </ul>
+                  {% else %}
+                  <p>No users added</p>
+                  {% endif %}
+               </div>
+            </div>
+            <!-- Super Users Section -->
+            <div class="mt-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="toggle-section" data-toggle-target="#collapseSuperUsers" style="cursor: pointer;">Super Users</h3>
+                </div>
+                <div class="collapse mt-3" id="collapseSuperUsers">
+                    {% if project.super_users.all %}
+                        <ul class="list-group">
+                            {% for super_user in project.super_users.all %}
+                                <li class="list-group-item">{{ super_user.email }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Invitations Section -->
+            <div class="mt-4">
+               <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="toggle-section" data-toggle-target="#collapseInvitations" style="cursor: pointer;">Pending invitations</h3>
+               </div>
+               <div class="collapse mt-3" id="collapseInvitations">
+                  {% if invitations and user in project.super_users.all %}
+                  <ul class="list-group">
+                     {% for invitation in invitations %}
+                     <li class="list-group-item">{{ invitation.target_user_email }}, sent on {{ invitation.date_created }}</li>
+                     {% endfor %}
+                  </ul>
+                  {% endif %}
+               </div>
+            </div>
 
+         </div>
+         <a href="{% url 'list_projects' %}" class="btn btn-secondary mt-3">Back to Projects</a>
+      </div>
+   </div>
+</div>
 <script>
-    document.getElementById('deleteBtn').addEventListener('click', function () {
-        if (confirm('Are you sure you want to delete this project?')) {
-            // Deletion logic placeholder
-            alert('Project deleted.');
-        }
+    // JavaScript to toggle the visibility of sections
+    const toggleSections = document.querySelectorAll('.toggle-section');
+    toggleSections.forEach(section => {
+        section.addEventListener('click', function () {
+            const target = this.getAttribute('data-toggle-target');
+            const targetElement = document.querySelector(target);
+            targetElement.classList.toggle('show');
+        });
     });
 </script>
+{% endblock %}

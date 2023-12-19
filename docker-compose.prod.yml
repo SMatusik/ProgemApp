@@ -1,0 +1,43 @@
+---
+
+version: '3.8'
+
+services:
+  web:
+    command: gunicorn --chdir app Progem.wsgi:application --bind 0.0.0.0
+    expose:
+      - 8000
+    environment:
+      GUNICORN_MEDIA: 1
+
+
+  postgresql: # temporary
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: progem
+      POSTGRES_PASSWORD: progem
+      POSTGRES_DB: progem
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - 5433:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U progem -d progem" ]
+      interval: 1s
+      timeout: 10s
+      retries: 60
+
+  nginx:
+    build: ./nginx
+#    volumes:
+#      - static:/static
+    ports:
+      - 1337:80
+    depends_on:
+      - web
+
+volumes:
+  pgdata: # temporary
+  static:

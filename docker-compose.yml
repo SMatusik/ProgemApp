@@ -5,37 +5,12 @@ version: '3.8'
 services:
   web:
     build: .
-    ports:
-      - 8001:8000
     volumes:
       - .:/app
     stdin_open: true
     tty: true
     environment:
       CONFIG_PATH: config.yml
-    depends_on:
-      postgresql:
-        condition: service_healthy
-
-
-  postgresql:
-    image: postgres:15
-    restart: always
-    environment:
-      POSTGRES_USER: progem
-      POSTGRES_PASSWORD: progem
-      POSTGRES_DB: progem
-      POSTGRES_HOST_AUTH_METHOD: trust
-    ports:
-      - 5433:5432
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U progem -d progem"]
-      interval: 1s
-      timeout: 10s
-      retries: 60
-
 
   redis:
     init: true
@@ -47,7 +22,3 @@ services:
       interval: 1s
       timeout: 10s
       retries: 60
-
-
-volumes:
-  pgdata:

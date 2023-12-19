@@ -2,10 +2,10 @@ from typing import Dict, Any
 
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect
 
 from .forms import RegisterForm, LoginForm
+from user.models import CustomUser
 
 
 def home(request):
@@ -43,14 +43,24 @@ def register(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            messages.success(request, "You've been registered mate" )
-            return redirect("/home")
-        messages.error(request, "Unsuccessful registration. Registration form is not valid.")
-    form = RegisterForm()
-    return render(request=request, template_name="registration/register.html", context={"register_form":form})
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password1']
+            password_confirm = form.cleaned_data['password2']
 
+            if CustomUser.objects.filter(email=email).exists() or CustomUser.objects.filter(email=email).exists():
+                messages.error(request, "User with this username/email already exists.")
+            elif password != password_confirm:
+                messages.error(request, "Passwords do not match.")
+            else:
+                user = form.save()
+                login(request, user)
+                messages.success(request, "You've been registered mate")
+                return redirect("/home")
+        else:
+            messages.error(request, "Unsuccessful registration. Registration form is not valid.")
+    else:
+        form = RegisterForm()
+    return render(request=request, template_name="registration/register.html", context={"register_form": form})
 
 def login_view(request):
     if request.method == 'POST':

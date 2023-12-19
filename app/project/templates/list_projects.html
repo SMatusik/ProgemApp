@@ -4,29 +4,49 @@
 {% load static %}
 
 {% block content %}
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-md-8 offset-md-2">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h1>List of Projects</h1>
-                    <a href="/project/create/" class="btn btn-primary">Create New</a>
-                </div>
-                {% if projects %}
-                    <ul class="list-group">
-                        {% for project in projects %}
-                            <li class="list-group-item">
-                                <a href="/project/view/{{ project.uuid }}/">{{ project.name }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <div class="d-flex justify-content-center align-items-center vh-100">
-                        <div class="text-center mt-5">
-                            <p>No projects yet. <a href="/project/create/">Want to create one?</a></p>
-                        </div>
-                    </div>
-                {% endif %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>List of Projects</h1>
+                <a href="/project/create/" class="btn btn-primary">Create New</a>
             </div>
+            {% if projects %}
+                <ul class="list-group">
+                    {% for project in projects %}
+                        <a href="/project/view/{{ project.uuid }}/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <div class="d-flex flex-column">
+                                <h5>{{ project.name }}</h5>
+                                <p class="mb-0 description" style="display: none;">{{ project.description }}, tasks: {{ project.tasks.count }}, status: {% if project.started %} active {% else %} not active {% endif %}</p>
+                            </div>
+                            <span class="badge {% if project.started %}bg-success{% else %}bg-secondary{% endif %}">{{ project.tasks.count }}</span>
+                        </a>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="d-flex justify-content-center align-items-center mt-5">
+                    <div class="text-center">
+                        <img src="{% static 'no-content.png' %}" alt="No Projects" class="img-fluid mb-4" style="max-width: 300px;">
+                        <p>No projects yet. <a href="/project/create/">Want to create one?</a></p>
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
+</div>
+
+<script>
+    // Script to show description on hover
+    document.addEventListener('DOMContentLoaded', function () {
+        const descriptions = document.querySelectorAll('.description');
+        descriptions.forEach((description) => {
+            description.parentElement.addEventListener('mouseenter', () => {
+                description.style.display = 'block';
+            });
+            description.parentElement.addEventListener('mouseleave', () => {
+                description.style.display = 'none';
+            });
+        });
+    });
+</script>
 {% endblock %}

@@ -12,3 +12,8 @@ class TaskForm(forms.ModelForm):
             'assignee': 'Assignee',
             'story_points': 'Story Points',
         }
+        widgets = {
+            'name': forms.Textarea(attrs={'rows': 1, 'cols': 15}),
+            'description': forms.Textarea(attrs={'rows': 4, 'cols': 15}),
+
+        }

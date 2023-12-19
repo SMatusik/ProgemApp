@@ -1,12 +1,25 @@
-{% extends 'base.html' %}
-{% block title %}Create task{% endblock %}
-
-{% load static %}
+{% extends "base.html" %}
 
 {% block content %}
-    <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Create Task</button>
-</form>
+
+{% load crispy_forms_tags %}
+
+<!--Task Creation-->
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="text-center mb-4"> <!-- Centering the title -->
+                 <h1 class="d-flex align-items-center">Create Task</h1>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <div class="text-center"> <!-- Centering only the button -->
+                    <button class="btn btn-primary" type="submit">Create Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

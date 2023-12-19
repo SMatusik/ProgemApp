@@ -21,6 +21,7 @@ class AppConfig(BaseModel):
     web: WebConfig
     db: DBConfig
 
+
 class ApplicationConfig(BaseModel):
     app: AppConfig
 
