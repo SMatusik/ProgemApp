@@ -1,7 +1,7 @@
 import os
 
-from pydantic import BaseModel
 import yaml
+from pydantic import BaseModel
 
 
 class DBConfig(BaseModel):
@@ -14,6 +14,7 @@ class DBConfig(BaseModel):
 
 class WebConfig(BaseModel):
     secret: str
+    host: str
     debug: bool
 
 
@@ -27,11 +28,9 @@ class ApplicationConfig(BaseModel):
 
 
 def read_config(path_env: str = "CONFIG_PATH") -> ApplicationConfig:
-    path = ''
-    if path_env in os.environ:
-        path = os.environ[path_env]
+    path = os.environ.get(path_env, "../config.yml")
 
-    with open(path, 'r') as file:
+    with open(path, "r") as file:
         yaml_config = yaml.safe_load(file)
 
     return ApplicationConfig(**yaml_config)

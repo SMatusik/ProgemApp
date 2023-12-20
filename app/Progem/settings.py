@@ -12,17 +12,15 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 
+from common.config import read_config
 from django.contrib import messages
 
-from common.config import read_config
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-
 config = read_config()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -33,8 +31,7 @@ SECRET_KEY = config.app.web.secret
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config.app.web.debug
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "0.0.0.0"]
-
+ALLOWED_HOSTS = [host for host in config.app.web.host]
 
 # Application definition
 
@@ -52,7 +49,7 @@ INSTALLED_APPS = [
     "invitation",
     # external
     "crispy_forms",
-    "crispy_bootstrap5"
+    "crispy_bootstrap5",
 ]
 
 
@@ -90,13 +87,13 @@ TEMPLATES = [
 WSGI_APPLICATION = "Progem.wsgi.application"
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config.app.db.name,
-        'USER': config.app.db.user,
-        'PASSWORD': config.app.db.password,
-        'HOST':  config.app.db.host,
-        'PORT': config.app.db.port,
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": config.app.db.name,
+        "USER": config.app.db.user,
+        "PASSWORD": config.app.db.password,
+        "HOST": config.app.db.host,
+        "PORT": config.app.db.port,
     }
 }
 
@@ -131,8 +128,11 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
-STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+STATIC_URL = "static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/media/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -142,17 +142,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_REDIRECT_URL = "/home"
 LOGOUT_REDIRECT_URL = "/home"
 CSRF_TRUSTED_ORIGINS = ["http://localhost:1337"]
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 MESSAGE_TAGS = {
-    messages.DEBUG: 'alert-info',
-    messages.INFO: 'alert-info',
-    messages.SUCCESS: 'alert-success',
-    messages.WARNING: 'alert-warning',
-    messages.ERROR: 'alert-danger',
+    messages.DEBUG: "alert-info",
+    messages.INFO: "alert-info",
+    messages.SUCCESS: "alert-success",
+    messages.WARNING: "alert-warning",
+    messages.ERROR: "alert-danger",
 }
 
 AUTH_USER_MODEL = "user.CustomUser"

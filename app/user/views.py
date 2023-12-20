@@ -1,11 +1,11 @@
-from typing import Dict, Any
+from typing import Any, Dict
 
-from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from django.shortcuts import render, redirect
-
-from .forms import RegisterForm, LoginForm
+from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import redirect, render
 from user.models import CustomUser
+
+from .forms import LoginForm, RegisterForm
 
 
 def home(request):
@@ -43,11 +43,14 @@ def register(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password1']
-            password_confirm = form.cleaned_data['password2']
+            email = form.cleaned_data["email"]
+            password = form.cleaned_data["password1"]
+            password_confirm = form.cleaned_data["password2"]
 
-            if CustomUser.objects.filter(email=email).exists() or CustomUser.objects.filter(email=email).exists():
+            if (
+                CustomUser.objects.filter(email=email).exists()
+                or CustomUser.objects.filter(email=email).exists()
+            ):
                 messages.error(request, "User with this username/email already exists.")
             elif password != password_confirm:
                 messages.error(request, "Passwords do not match.")
@@ -57,26 +60,32 @@ def register(request):
                 messages.success(request, "You've been registered mate")
                 return redirect("/home")
         else:
-            messages.error(request, "Unsuccessful registration. Registration form is not valid.")
+            messages.error(
+                request, "Unsuccessful registration. Registration form is not valid."
+            )
     else:
         form = RegisterForm()
-    return render(request=request, template_name="registration/register.html", context={"register_form": form})
+    return render(
+        request=request,
+        template_name="registration/register.html",
+        context={"register_form": form},
+    )
+
 
 def login_view(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = LoginForm(request.POST)
-        username = request.POST.get('login')
-        password = request.POST.get('password')
+        username = request.POST.get("login")
+        password = request.POST.get("password")
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
             messages.success(request, message="You've been logged in!")
-            return redirect('home')
+            return redirect("home")
         else:
+            messages.error(request, "Invalid email or password")
 
-            messages.error(request, 'Invalid email or password')
-
-    return render(request, 'registration/login.html')
+    return render(request, "registration/login.html")
 
 
 def password_reset(request):

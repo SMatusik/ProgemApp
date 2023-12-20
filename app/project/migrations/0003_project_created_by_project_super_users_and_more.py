@@ -6,27 +6,35 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('project', '0002_alter_project_end_date'),
+        ("project", "0002_alter_project_end_date"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='project',
-            name='created_by',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, related_name='created_by', to=settings.AUTH_USER_MODEL),
+            model_name="project",
+            name="created_by",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="created_by",
+                to=settings.AUTH_USER_MODEL,
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='project',
-            name='super_users',
-            field=models.ManyToManyField(related_name='superusers', to=settings.AUTH_USER_MODEL),
+            model_name="project",
+            name="super_users",
+            field=models.ManyToManyField(
+                related_name="superusers", to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AlterField(
-            model_name='project',
-            name='users',
-            field=models.ManyToManyField(related_name='users', to=settings.AUTH_USER_MODEL),
+            model_name="project",
+            name="users",
+            field=models.ManyToManyField(
+                related_name="users", to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]

@@ -4,13 +4,13 @@ version: '3.8'
 
 services:
   web:
-    build: .
+    build: ./app
     volumes:
-      - .:/app
+      - ./config.yml:/config.yml
     stdin_open: true
     tty: true
     environment:
-      CONFIG_PATH: config.yml
+      CONFIG_PATH: ../config.yml
 
   redis:
     init: true
