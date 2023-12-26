@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}View Project{% endblock %}
+{% load static %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6" style="margin-top: 30px;"> <!-- Added margin-top -->
+            <h1>Assigned Tasks</h1>
+            <ul class="list-group">
+                {% for task in assigned_tasks %}
+                    <li class="list-group-item">
+                        <a href="{% url 'view_project' task.project.uuid %}" class="task-link">
+                            <span class="task-text">
+                                {{ task.name }} - Project: {{ task.project.name }}
+                            </span>
+                        </a>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item">No assigned tasks</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-md-6" style="margin-top: 30px;"> <!-- Added margin-top -->
+            <h1>Reported Tasks</h1>
+            <ul class="list-group">
+                {% for task in reported_tasks %}
+                    <li class="list-group-item">
+                        <a href="{% url 'view_project' task.project.uuid %}" class="task-link">
+                            <span class="task-text">
+                                {{ task.name }} - Project: {{ task.project.name }}
+                            </span>
+                        </a>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item">No reported tasks</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+<style>
+    /* Remove default hyperlink styling */
+    .task-link {
+        text-decoration: none; /* Remove underline */
+        color: inherit; /* Use the default color */
+    }
+
+    /* Define hover effect for task text */
+    .task-link:hover .task-text {
+        font-weight: bold; /* Make text bold on hover */
+    }
+</style>
+{% endblock %}

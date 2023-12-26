@@ -6,6 +6,7 @@ from django.shortcuts import redirect, render
 from user.models import CustomUser
 
 from .forms import LoginForm, RegisterForm
+from common.messages import MessageText
 
 
 def home(request):
@@ -24,7 +25,7 @@ def home(request):
 
 def test_messages(request):
     # view to test some things
-    messages.success(request=request, message="teeest")
+    messages.success(request=request, message=MessageText.TEST)
 
     return render(request, "home.html")
 
@@ -51,17 +52,17 @@ def register(request):
                 CustomUser.objects.filter(email=email).exists()
                 or CustomUser.objects.filter(email=email).exists()
             ):
-                messages.error(request, "User with this username/email already exists.")
+                messages.error(request=request, message=MessageText.REGISTER.USER_ALREADY_EXISTS)
             elif password != password_confirm:
                 messages.error(request, "Passwords do not match.")
             else:
                 user = form.save()
                 login(request, user)
-                messages.success(request, "You've been registered mate")
+                messages.success(request=request, message=MessageText.REGISTER.SUCCESS)
                 return redirect("/home")
         else:
             messages.error(
-                request, "Unsuccessful registration. Registration form is not valid."
+                request=request, message=MessageText.REGISTER.FAILURE
             )
     else:
         form = RegisterForm()
@@ -80,25 +81,21 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            messages.success(request, message="You've been logged in!")
+            messages.success(request, message=MessageText.LOGIN.SUCCESS)
             return redirect("home")
         else:
-            messages.error(request, "Invalid email or password")
+            messages.error(request=request, message=MessageText.LOGIN.FAILURE)
 
     return render(request, "registration/login.html")
 
 
 def password_reset(request):
+    # TO DO
     pass
 
 
 def log_out(request):
     logout(request)
-
-    messages.success(request, "You've been logged out, mate.")
+    messages.success(request=request, message=MessageText.LOGOUT.SUCCESS)
     return redirect("/home")
 
-
-def view_user_invitations(request):
-    # Invitations
-    return redirect("home")

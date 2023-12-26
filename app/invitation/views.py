@@ -8,6 +8,8 @@ from django.shortcuts import redirect, render
 from invitation.models import ProjectInvitation
 from project.models import Project
 
+from common.messages import MessageText
+
 
 @login_required
 def create_invitation(request: HttpRequest, project_id: UUID) -> HttpResponse:
@@ -15,18 +17,25 @@ def create_invitation(request: HttpRequest, project_id: UUID) -> HttpResponse:
 
     if request.method == "POST":
         target_email = request.POST.get("target_email")
+        invitation = ProjectInvitation.objects.filter(
+            Q(project_id=project_id) &
+            Q(target_user_email=target_email) &
+            Q(active=True)
+        ).first()
 
-        new_invitation = ProjectInvitation(
-            project=project,
-            target_user_email=target_email,
-            created_by=request.user,
-        )
-        new_invitation.save()
-
-        messages.success(
-            request=request,
-            message=f"User {target_email} has been invited to your project",
-        )
+        if not invitation:
+            new_invitation = ProjectInvitation(
+                project=project,
+                target_user_email=target_email,
+                created_by=request.user,
+            )
+            new_invitation.save()
+            messages.success(
+                request=request,
+                message=MessageText.INVITATION.INVITED_TO_PROJECT.format(username=target_email)
+            )
+        else:
+            messages.error(request=request, message=MessageText.INVITATION.ALREADY_SENT.format(project_name=project.name))
 
         return redirect("view_project", project_id)
     else:
@@ -39,7 +48,7 @@ def list_invitations_for_user(request: HttpRequest) -> HttpResponse:
         Q(target_user_email=request.user.email) & Q(active=True)
     )
     if not invitations:
-        messages.warning(request=request, message="You've got no invitations :(")
+        messages.warning(request=request, message=MessageText.INVITATION.NO_INVITATIONS)
 
     return render(request, "list_invitations.html", {"invitations": invitations})
 
@@ -47,11 +56,12 @@ def list_invitations_for_user(request: HttpRequest) -> HttpResponse:
 @login_required
 def list_invitations_for_project(request, project_id: UUID):
     # TODO check for users not belonging to project
-    invitations = ProjectInvitation.objects.filter(
-        Q(uuid=invitation_id) & Q(target_user_email=user.email) & Q(active=True)
-    ).first()
-    invitations = ProjectInvitation.objects.filter()
-    return render(request, "list_invitations.html", {"invitations": invitations})
+    pass
+    # invitations = ProjectInvitation.objects.filter(
+    #     Q(uuid=invitation_id) & Q(target_user_email=user.email) & Q(active=True)
+    # ).first()
+    # invitations = ProjectInvitation.objects.filter()
+    # return render(request, "list_invitations.html", {"invitations": invitations})
 
 
 @login_required
@@ -72,7 +82,7 @@ def accept_invitation(request, invitation_id: UUID):
 
     messages.success(
         request=request,
-        message=f"Invitation to {project.name} has been accepted. Now you have got access",
+        message=MessageText.INVITATION.ACCEPTED.format(project_name=project.name),
     )
 
     return redirect("view_project", invitation.project.uuid)
@@ -90,7 +100,23 @@ def decline_invitation(request, invitation_id: UUID):
     invitation.save()
 
     messages.success(
-        request=request, message=f"You've successfully declined invitation"
+        request=request, message=MessageText.INVITATION.DECLINED
     )
 
     return redirect("list_user_invitations")
+
+
+@login_required
+def revoke_invitation(request, invitation_id: UUID):
+    invitation = ProjectInvitation.objects.filter(
+        Q(uuid=invitation_id)
+    ).first()
+
+    invitation.active = False
+    invitation.save()
+
+    messages.success(
+        request=request, message=MessageText.INVITATION.REVOKED.format(email=invitation.target_user_email)
+    )
+
+    return redirect("view_project", invitation.project.uuid)

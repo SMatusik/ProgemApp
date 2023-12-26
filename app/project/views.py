@@ -5,7 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import redirect, render
 from invitation.models import ProjectInvitation
-from task.models import Task
+from task.models import Task, TaskState
+from user.models import CustomUser
 
 from .models import Project
 
@@ -73,7 +74,13 @@ def view_project(request, project_id: UUID):
         Q(project=project) & Q(active=True)
     ).all()
     tasks = Task.objects.filter(Q(project=project)).all()
-    context = {"project": project, "invitations": invitations, "tasks": tasks}
+    sorted_tasks = sorted(tasks, key=lambda task: TaskState.state_order().get(task.state, 99))
+    context = {
+        "project": project,
+        "invitations": invitations,
+        "tasks": sorted_tasks,
+        "users_count": project.users.count() + project.super_users.count(),
+    }
 
     return render(request, "view_project.html", context)
 
@@ -86,11 +93,34 @@ def edit_project(request, project_id: UUID):
 
 
 @login_required
-def delete_project(request, project_id: UUID):
-    project = Project.objects.filter(uuid=project_id).first().delete()
+def delete_user_from_project(request, project_id: UUID, user_id: UUID):
+    project = Project.objects.filter(Q(uuid=project_id) | Q(super_users=request.user)).first()
+    if not project:
+        print("cannot unassign")
 
+    user = CustomUser.objects.filter(uuid=user_id).first()
+    if user in project.users.all():
+
+        project.users.remove(user)
+        project.save()
+        messages.success(request=request, message=f"Unassigned user {user.email} from project.")
+
+    # if user in project.super_users.all():
+    #     project.super_users.remove(user)
+    #     print("deleted super user from a project")
+
+    return render(request, "view_project.html", {"project": project})
+
+
+@login_required
+def delete_project(request, project_id: UUID):
+    project = Project.objects.filter(uuid=project_id).first()
+    project_name = project.name
+    project.delete()
     messages.success(
-        request=request, message=f"Project {project.name} has been sucessfully deleted."
+        request=request, message=f"Project {project_name} has been successfully deleted."
     )
 
     return redirect("list_projects")
+
+

@@ -13,6 +13,25 @@ class TaskState(Enum):
     TO_DO = "TO DO"
     NEEDS_DISCUSSION = "NEEDS DISCUSSION"
 
+    def __str__(self):
+        return self.value
+
+    def __repr__(self):
+        return self.value
+
+
+
+    @classmethod
+    def state_order(cls):
+        return {
+            cls.TO_DO.value: 10,
+            cls.NEEDS_DISCUSSION.value: 20,
+            cls.PROGRESS.value: 30,
+            cls.IN_REVIEW.value: 40,
+            cls.DONE.value: 50,
+        }
+
+
 
 class Task(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -48,3 +67,11 @@ class Task(models.Model):
 
     def __str__(self):
         return f"task: {self.name} in project: {self.project.name}"
+
+    @staticmethod
+    def get_available_states():
+        return list([task_state.value for task_state in TaskState])
+
+    def get_state_display(self):
+        return self.state
+

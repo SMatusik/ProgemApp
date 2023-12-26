@@ -19,4 +19,9 @@ urlpatterns = [
         views.decline_invitation,
         name="decline_invitation",
     ),
+    path(
+        "revoke/<uuid:invitation_id>",
+        views.revoke_invitation,
+        name="revoke_invitation",
+    ),
 ]

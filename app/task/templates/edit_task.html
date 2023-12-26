@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Edit task{% endblock %}
+
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1>Edit Task: {{ task.name }}</h1>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Save</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

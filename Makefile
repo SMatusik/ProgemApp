@@ -9,11 +9,13 @@ run:				## Runs the app
 run-dev:				## Runs the app
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 run-db:				## Runs the app
-	docker-compose -f docker-compose.yml run postgresql
+	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d postgresql
 build:				## Builds docker images
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml build
 build-dev:				## Builds docker images
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml build
 cli:				## Entrypoint to web app (helps with Django 'python3 manage.py cmd')
 	docker-compose -f docker-compose.yml run --rm --entrypoint /bin/bash web
+requirements:       ## export requirements from poetry
+	poetry export --format=requirements.txt > app/requirements.txt
 
